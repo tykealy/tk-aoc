@@ -1,0 +1,12 @@
+# Compiled executables
+**/*.exe
+**/*.o
+**/*.out
+
+# Editor files
+.DS_Store
+.vscode/
+.idea/
+
+# Temporary files
+tempCodeRunnerFile.cpp
