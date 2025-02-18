@@ -1,83 +1,67 @@
-#include <map>
 #include <iostream>
-#include <string>
-#include <chrono>
 #include <fstream>
-#include <regex>
+#include <sstream>
+#include <unordered_map>
+#include <vector>
+#include <typeinfo>
 using namespace std;
-using namespace std::chrono;
 
-struct Wire
-{
-    string name;
-    string operation;
-    string input1;
-    string input2;
-    unsigned int value = 0;
-};
-
-vector<string> readInput(const string &filename)
+unordered_map<string, vector<string>> parseInput(const string &filename)
 {
     ifstream file(filename);
-    vector<string> lines;
+    unordered_map<string, vector<string>> instructions;
     string line;
 
     while (getline(file, line))
     {
-        lines.push_back(line);
+        stringstream ss(line);
+        string token, lhs, op, rhs, arrow, dest;
+        vector<string> parts;
+
+        ss >> lhs;
+        if (lhs == "NOT")
+        {
+            // "NOT x -> y"
+            ss >> rhs >> arrow >> dest;
+            parts = {"NOT", rhs}; // Store operation and operand
+        }
+        else
+        {
+            ss >> op;
+            if (op == "->")
+            {
+                // "123 -> x" or "a -> b"
+                dest = op; // Assign dest first
+                parts = {"ASSIGN", lhs};
+            }
+            else
+            {
+                // "x AND y -> z"
+                ss >> rhs >> arrow >> dest;
+                parts = {op, lhs, rhs}; // Store full operation
+            }
+        }
+
+        instructions[dest] = parts; // Store parsed instruction
     }
 
-    return lines;
-}
-
-vector<Wire> parseInstructions(const string &input)
-{
-    // Define regex patterns
-    regex assignmentRegex(R"((\d+|[a-z]+) -> ([a-z]+))");                                 // Matches `123 -> x`
-    regex binaryRegex(R"((\d+|[a-z]+) (AND|OR|LSHIFT|RSHIFT) (\d+|[a-z]+) -> ([a-z]+))"); // Matches `x AND y -> d`
-    regex unaryRegex(R"(NOT (\d+|[a-z]+) -> ([a-z]+))");                                  // Matches `NOT x -> h`
-
-    vector<Wire> parsedInstructions;
-    smatch match;
-
-    // Split input into lines
-    stringstream ss(input);
-    string line;
-    while (getline(ss, line))
-    {
-        if (regex_match(line, match, assignmentRegex))
-        {
-            // Assignment operation
-            parsedInstructions.push_back({match[1], "", "ASSIGN", match[2]});
-        }
-        else if (regex_match(line, match, binaryRegex))
-        {
-            // Binary operation
-            parsedInstructions.push_back({match[1], match[3], match[2], match[4]});
-        }
-        else if (regex_match(line, match, unaryRegex))
-        {
-            // Unary operation
-            parsedInstructions.push_back({match[1], "", "NOT", match[2]});
-        }
-    }
-
-    return parsedInstructions;
+    return instructions;
 }
 
 int main()
 {
-    vector<string> lines = readInput("input.txt");
-    // Parse the instructions
-    vector<Wire> parsedInstructions;
-    for (const auto &line : lines)
+
+    string filename = "input.txt";
+    unordered_map<string, vector<string>> instructions = parseInput(filename);
+    unordered_map<string, int> memo = {};
+    // Debugging: Print parsed instructions
+    for (const auto &[wire, expr] : instructions)
     {
-        auto parsedLine = parseInstructions(line);
-        parsedInstructions.insert(parsedInstructions.end(), parsedLine.begin(), parsedLine.end());
+        cout << wire << " ";
+        for (const auto &part : expr)
+            cout << part << " ";
+        cout << endl;
     }
 
-    // Output the parsed instructions
-    for (const auto &instr : parsedInstructions)
-    {
-    }
+    return 0;
 }
