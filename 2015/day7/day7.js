@@ -2,7 +2,7 @@ const fs = require("fs");
 
 const filename = "input.txt";
 const instructions = parseInput(filename);
-const memo = new Map();
+let memo = new Map();
 
 function parseInput(filename) {
     const instructions = new Map();
@@ -32,8 +32,7 @@ function parseInput(filename) {
     return instructions;
 }
 
-function get_value(token){
-    console.log(token);
+function get_value(token,){
     
     let value = /^\d+$/.test(token) ? parseInt(token, 10) : token;
 
@@ -75,7 +74,15 @@ function get_value(token){
     memo.set(token, val);
     return val
 }
-
+console.log(instructions.get('b'))
+let b = get_value('a')
+instructions.set('b', ['ASSIGN', b.toString()])
+console.log(instructions.get('b'))
+memo.clear()
 console.log(get_value('a'))
+
+
+
+
 
 
