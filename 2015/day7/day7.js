@@ -74,12 +74,12 @@ function get_value(token,){
     memo.set(token, val);
     return val
 }
-console.log(instructions.get('b'))
+console.log("Part 1:", get_value('a'));
+
 let b = get_value('a')
 instructions.set('b', ['ASSIGN', b.toString()])
-console.log(instructions.get('b'))
 memo.clear()
-console.log(get_value('a'))
+console.log("Part 2:", get_value('a'));
 
 
 
